@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import path from "path"
+import fs from "fs"
 import puppeteer from "puppeteer-core"
 import pti from "puppeteer-to-istanbul"
 import yargs from "yargs"
@@ -28,9 +30,34 @@ async function start() {
         ])
 
         pti.write([...jsCoverage], {
-          includeHostname: true,
+          includeHostname: false,
           storagePath: "./.nyc_output",
         })
+
+        /*
+        
+        @todo: find a better way
+        
+        */
+
+        let o = await fs.promises
+          .readFile(path.resolve("./.nyc_output/out.json"), "utf8")
+          .then(JSON.parse)
+
+        let x = {}
+
+        for (const k in o) {
+          x[k.replace(`.nyc_output/`, "")] = {
+            ...o[k],
+            path: o[k].path.replace(`.nyc_output/`, ""),
+          }
+        }
+
+        fs.writeFileSync(
+          path.resolve("./.nyc_output/out.json"),
+          JSON.stringify(x, null, 2),
+          "utf8"
+        )
 
         browser.close().then(() => process.exit(stats.failures === 0 ? 0 : 1))
       })
@@ -40,7 +67,9 @@ async function start() {
     .then(async (p) => {
       page = p
       await Promise.all([
-        page.coverage.startJSCoverage(),
+        page.coverage.startJSCoverage({
+          // resetOnNavigation: false,
+        }),
         // page.coverage.startCSSCoverage(),
       ])
       page.goto(TEST_SUITE_URL)
