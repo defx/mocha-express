@@ -10,17 +10,21 @@ export function loadPage(url) {
   return launchChrome()
     .then(async (chrome) => {
       const protocol = await CDP({ port: chrome.port })
+
+      const end = () => {
+        protocol.close()
+        chrome.kill()
+      }
+
       try {
         const { Page } = protocol
         await Page.enable()
-        console.log(`navigating to ${url}`)
         Page.navigate({ url })
-        return Page.loadEventFired()
+        await Page.loadEventFired()
+        return end
       } catch (err) {
         console.error(err)
-      } finally {
-        protocol.close()
-        chrome.kill()
+        end()
       }
     })
     .catch((err) => console.error(err))
