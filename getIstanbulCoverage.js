@@ -6,10 +6,10 @@ import v8toIstanbul from "v8-to-istanbul"
 import { getCoverage } from "./getCoverage.js"
 import libCoverage from "istanbul-lib-coverage"
 
-export async function getIstanbulCoverage(url) {
+export async function getIstanbulCoverage(url, glob) {
   const coverage = await getCoverage(url)
 
-  const files = await globby(`src/*.js`)
+  const files = await globby(glob)
 
   // filter only the files we actually want coverage for...
 

@@ -13,9 +13,9 @@ export function loadPage(url) {
       try {
         const { Page } = protocol
         await Page.enable()
+        console.log(`navigating to ${url}`)
         Page.navigate({ url })
-        await Page.loadEventFired()
-        return
+        return Page.loadEventFired()
       } catch (err) {
         console.error(err)
       } finally {
