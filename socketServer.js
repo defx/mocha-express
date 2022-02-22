@@ -2,7 +2,7 @@ import { EventEmitter } from "events"
 import Mocha from "mocha"
 import Spec from "mocha/lib/reporters/spec.js"
 import createStatsCollector from "mocha/lib/stats-collector.js"
-import WebSocket from "ws"
+import { WebSocketServer } from "ws"
 
 const { EVENT_RUN_END } = Mocha.Runner.constants
 
@@ -20,7 +20,7 @@ const deserialize = (o) =>
 export function socketServer(opts = {}) {
   return new Promise((resolve) => {
     const { port = 7777 } = opts
-    const wss = new WebSocket.Server({ port })
+    const wss = new WebSocketServer({ port })
     const runner = new EventEmitter()
 
     createStatsCollector(runner)
