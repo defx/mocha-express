@@ -6,7 +6,7 @@ const launchChrome = () =>
     chromeFlags: ["--disable-gpu", "--headless"],
   })
 
-export function getCoverage(url) {
+export function getCoverage(url, testSuiteComplete) {
   return launchChrome()
     .then(async (chrome) => {
       const protocol = await CDP({ port: chrome.port })
@@ -14,11 +14,10 @@ export function getCoverage(url) {
         const { Page, Profiler } = protocol
         await Profiler.enable()
         await Page.enable()
-
         await Profiler.startPreciseCoverage()
 
         Page.navigate({ url })
-        await Page.loadEventFired()
+        await testSuiteComplete
 
         const res = await Profiler.takePreciseCoverage()
         await Profiler.stopPreciseCoverage()

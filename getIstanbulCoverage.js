@@ -12,12 +12,11 @@ import libCoverage from "istanbul-lib-coverage"
 
 */
 
-export async function getIstanbulCoverage(url, glob) {
-  const coverage = await getCoverage(url)
+export async function getIstanbulCoverage(url, glob, p) {
+  const coverage = await getCoverage(url, p)
   const files = await globby(glob)
 
   // filter only the files we actually want coverage for...
-
   const results = coverage.result
     .filter((result) => result.url.startsWith(url))
     .map((result) => {
@@ -33,14 +32,12 @@ export async function getIstanbulCoverage(url, glob) {
     .filter((result) => result.url.length)
     .filter((result) => files.find((url) => url === result.url))
 
-  console.log(results.map(({ url }) => url))
-
   const map = libCoverage.createCoverageMap()
 
   for (const result of results) {
     const { url, functions } = result
 
-    const converter = v8toIstanbul(path.resolve(url), 0)
+    const converter = v8toIstanbul(path.resolve(url))
     await converter.load()
 
     converter.applyCoverage(functions)
