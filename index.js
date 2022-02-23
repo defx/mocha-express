@@ -7,6 +7,7 @@ import { testSuiteServer } from "./testSuiteServer.js"
 import { socketServer } from "./socketServer.js"
 import { getIstanbulCoverage } from "./getIstanbulCoverage.js"
 import { loadPage } from "./loadPage.js"
+import { createReport } from "./createReport.js"
 
 const TEST_SUITE_URL = "http://localhost:5001"
 
@@ -22,8 +23,8 @@ async function start() {
       `http://localhost:5001`,
       `src/*.js`
     )
-    console.log(coverage)
     end()
+    createReport(coverage)
     process.exit(stats.failures === 0 ? 0 : 1)
   })
   testSuiteServer()
