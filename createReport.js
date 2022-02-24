@@ -10,7 +10,7 @@ const watermarks = {
 
 export const createReport = (
   coverageMap,
-  type = "html",
+  type = "lcov",
   dir = "./coverage"
 ) => {
   const context = libReport.createContext({

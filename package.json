@@ -15,7 +15,8 @@
     "test",
     "runner",
     "mocha",
-    "browser"
+    "browser",
+    "coverage"
   ],
   "author": "defx",
   "license": "MIT",
