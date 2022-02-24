@@ -29,6 +29,14 @@ let tpl = (tests) => {
           })
         </script>
         ${scripts}
+        <script>
+          new WebSocket("ws://localhost:80").addEventListener(
+            "message",
+            (event) => {
+              if (event.data === "reload") window.location.reload()
+            }
+          )
+        </script>
       </body>
     </html>
   `

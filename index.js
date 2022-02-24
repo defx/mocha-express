@@ -9,6 +9,7 @@ import { getIstanbulCoverage } from "./getIstanbulCoverage.js"
 
 import { createReport } from "./createReport.js"
 import { loadPage } from "./loadPage.js"
+import { watch } from "./watch.js"
 
 const TEST_SUITE_URL = "http://localhost:5001"
 
@@ -25,8 +26,12 @@ async function start() {
     loadPage(TEST_SUITE_URL)
   }
 
-  p.then((stats) => {
-    process.exit(stats.failures === 0 ? 0 : 1)
-  })
+  if (argv.watch) {
+    watch([`src/**/*.js`, `test/**/*.js`], 80)
+  } else {
+    p.then((stats) => {
+      process.exit(stats.failures === 0 ? 0 : 1)
+    })
+  }
 }
 start()
