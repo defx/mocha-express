@@ -19,7 +19,6 @@ let tpl = (tests) => {
         <div id="container"></div>
         <script src="https://unpkg.com/chai/chai.js"></script>
         <script src="https://unpkg.com/mocha/mocha.js"></script>
-
         <script type="module">
           import { wsReporter } from "https://unpkg.com/mocha-ws-reporter@0.1.3"
 
@@ -27,6 +26,35 @@ let tpl = (tests) => {
             ui: "bdd",
             reporter: wsReporter({ port: 7777 }),
           })
+        </script>
+        <script>
+          const identityTpl = (strings, ...values) =>
+            strings.reduce((a, v, i) => a + v + (values[i] || ""), "")
+
+          const mount = (v) => {
+            let node = document.getElementById("container")
+            node.innerHTML = ""
+
+            if (typeof v === "string") node.innerHTML = v
+            if (v.nodeName) node.appendChild(v)
+            return node.firstChild
+          }
+
+          const nextFrame = () =>
+            new Promise((resolve) => requestAnimationFrame(resolve))
+
+          window.mount = mount
+          window.html = identityTpl
+          window.css = identityTpl
+          window.nextFrame = nextFrame
+          window.assert = chai.assert
+          window.$ = (v) => document.querySelector("#container " + v)
+          window.$$ = (v) =>
+            Array.from(document.querySelectorAll("#container " + v))
+
+          let count = 0
+
+          window.createName = () => "x-" + count++
         </script>
         ${scripts}
         <script>
@@ -44,16 +72,9 @@ let tpl = (tests) => {
 
 async function init(app) {
   // @todo: make this configurable
-  const testSuiteHTML = await globby(["test/**/*.js"])
-    .then((files) => {
-      files.sort((a, b) => {
-        if (b === "test/setup.js") return 1
-        if (a === "test/setup.js") return -1
-        return 0
-      })
-      return files
-    })
-    .then((files) => tpl(files))
+  const testSuiteHTML = await globby(["test/**/*.js"]).then((files) =>
+    tpl(files)
+  )
 
   app.use(express.static("./"))
 
