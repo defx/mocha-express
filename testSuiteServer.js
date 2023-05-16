@@ -79,7 +79,6 @@ async function init(app) {
     "**/*spec.js",
     "!node_modules",
   ]).then((files) => {
-    console.log(files)
     return tpl(files)
   })
 
