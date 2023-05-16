@@ -20,14 +20,21 @@ async function start() {
   testSuiteServer()
 
   if (argv.coverage) {
-    const coverage = await getIstanbulCoverage(TEST_SUITE_URL, `src/**/*.js`, p)
+    const coverage = await getIstanbulCoverage(
+      TEST_SUITE_URL,
+      [`src/**/*.js`, `!*test.js`, `!*spec.js`],
+      p
+    )
     createReport(coverage)
   } else {
     loadPage(TEST_SUITE_URL)
   }
 
   if (argv.watch) {
-    watch([`src/**/*.js`, `test/**/*.js`], 80)
+    watch(
+      [`src/**/*.js`, `test/**/*.js`, `spec/**/*.js`, `*test.js`, `*spec.js`],
+      80
+    )
   } else {
     p.then((stats) => {
       process.exit(stats.failures === 0 ? 0 : 1)

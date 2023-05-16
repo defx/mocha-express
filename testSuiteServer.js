@@ -72,9 +72,16 @@ let tpl = (tests) => {
 
 async function init(app) {
   // @todo: make this configurable
-  const testSuiteHTML = await globby(["test/**/*.js"]).then((files) =>
-    tpl(files)
-  )
+  const testSuiteHTML = await globby([
+    "test/**/*.js",
+    "spec/**/*.js",
+    "**/*test.js",
+    "**/*spec.js",
+    "!node_modules",
+  ]).then((files) => {
+    console.log(files)
+    return tpl(files)
+  })
 
   app.use(express.static("./"))
 
