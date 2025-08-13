@@ -95,9 +95,9 @@ mocha-express --headless --coverage
 
 ---
 
-## Cross-browser/device testing
+## Bring your own browser
 
-Because mocha-express runs as a standard HTML server, you can easily deploy it wherever you need it and connect from different devices and/or browsers.
+Because mocha-express runs as a standard HTML server, you can easily deploy it wherever you need it and connect from any device or browser.
 
 ## Contributing
 
