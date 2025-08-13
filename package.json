@@ -1,7 +1,7 @@
 {
   "name": "mocha-express",
   "type": "module",
-  "version": "0.1.2",
+  "version": "0.2.1",
   "description": "Minimal test runner for Mocha in the browser",
   "main": "index.js",
   "bin": {
@@ -37,5 +37,8 @@
     "ws": "^8.5.0",
     "yargs": "^17.3.1"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "scripts": {
+    "publish": "npm publish"
+  }
 }
