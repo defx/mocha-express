@@ -1,6 +1,6 @@
 # mocha-express
 
-Lightweight browser-based testing using Mocha. Runs your tests in headless Chrome by default so that you can execute from the CLI and CI/CD. Exposes your tests via a HTTP server so that you can serve your tests and connect from any device/browser.
+Browser-based JavaScript testing with Mocha over HTTP that runs on any browser and/or device.
 
 **Key Features:**
 
@@ -9,7 +9,6 @@ Lightweight browser-based testing using Mocha. Runs your tests in headless Chrom
 - Works with **any browser-compatible assertion library** (e.g., Chai).
 - **Watch mode** for instant feedback during development.
 - **Code coverage** via **Istanbul**.
-- **CI-ready** with proper exit codes.
 
 ---
 
@@ -35,7 +34,7 @@ mocha-express
 
 ## Watch Mode
 
-For fast feedback during development, enable watch mode to re-run tests whenever the code changes...
+For fast feedback during development, enable watch mode to re-run tests whenever your code changes...
 
 ```bash
 mocha-express --watch
