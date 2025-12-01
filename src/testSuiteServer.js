@@ -1,9 +1,19 @@
+import { fileURLToPath } from "url";
+import fs from "fs";
+import path from "path";
+import esbuild from "esbuild";
 import express from "express";
 import { globby } from "globby";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 let tpl = (tests) => {
   const scripts = tests
-    .map((src) => `<script type="module" src="${src}"></script>`)
+    .map((src) => {
+      const jsFile = src.replace(/\.ts$/, ".ts.js");
+      return `<script type="module" src="./${jsFile}"></script>`;
+    })
     .join("\n");
 
   return /* HTML */ `
@@ -12,15 +22,17 @@ let tpl = (tests) => {
       <head>
         <meta charset="utf-8" />
         <title>Mocha Tests</title>
-        <link rel="stylesheet" href="https://unpkg.com/mocha/mocha.css" />
+        <link rel="stylesheet" href="mocha.css" />
       </head>
       <body>
         <div id="mocha"></div>
         <div id="container"></div>
-
-        <script src="https://unpkg.com/mocha/mocha.js"></script>
+        <script src="mocha.js"></script>
         <script type="module">
-          import { wsReporter } from "https://unpkg.com/mocha-ws-reporter@0.1.3";
+          import { wsReporter } from "/mocha-ws-reporter.js";
+          import { expect } from "/chai.js";
+
+          window.expect = expect;
 
           mocha.setup({
             ui: "bdd",
@@ -42,18 +54,94 @@ let tpl = (tests) => {
 };
 
 async function init(app) {
-  // @todo: make this configurable
-  const testSuiteHTML = await globby([
-    "test/**/*.js",
-    "spec/**/*.js",
-    "**/*test.js",
-    "**/*spec.js",
+  const testFiles = await globby([
+    "test/**/*.{js,ts}",
+    "spec/**/*.{js,ts}",
+    "**/*test.{js,ts}",
+    "**/*spec.{js,ts}",
     "!node_modules",
-  ]).then((files) => {
-    return tpl(files);
+  ]);
+
+  const testSuiteHTML = tpl(testFiles);
+
+  app.get("/mocha.js", (req, res) => {
+    const filePath = path.join(
+      __dirname,
+      "../node_modules",
+      "mocha",
+      "mocha.js"
+    );
+    res.sendFile(filePath, (err) => {
+      if (err) {
+        res.status(404).send("File not found");
+      }
+    });
   });
 
-  app.use(express.static("./"));
+  app.get("/mocha-ws-reporter.js", (req, res) => {
+    const filePath = path.join(
+      __dirname,
+      "../node_modules",
+      "mocha-ws-reporter",
+      "index.js"
+    );
+    res.sendFile(filePath, (err) => {
+      if (err) {
+        res.status(404).send("File not found");
+      }
+    });
+  });
+
+  app.get("/chai.js", (req, res) => {
+    const filePath = path.join(
+      __dirname,
+      "../node_modules",
+      "chai",
+      "index.js"
+    );
+    res.sendFile(filePath, (err) => {
+      if (err) {
+        res.status(404).send("File not found");
+      }
+    });
+  });
+
+  app.get("/mocha.css", (req, res) => {
+    const filePath = path.join(
+      __dirname,
+      "../node_modules",
+      "mocha",
+      "mocha.css"
+    );
+    res.sendFile(filePath, (err) => {
+      if (err) {
+        res.status(404).send("File not found");
+      }
+    });
+  });
+
+  app.use(async (req, res, next) => {
+    let requested = req.path.replace(/^\//, "");
+
+    if (!requested.endsWith(".js")) {
+      return next();
+    }
+
+    const file = await fs.promises.readFile(
+      requested.endsWith(".ts.js")
+        ? requested.replace(/\.ts\.js$/, ".ts")
+        : requested,
+      "utf8"
+    );
+
+    let { code } = await esbuild.transform(file, {
+      format: "esm",
+      sourcemap: "inline",
+    });
+
+    res.type("application/javascript");
+    return res.send(code);
+  });
 
   app.get("/", (_, res) => {
     res.send(testSuiteHTML);
