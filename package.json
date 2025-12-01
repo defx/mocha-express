@@ -1,7 +1,7 @@
 {
   "name": "mocha-express",
   "type": "module",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Minimal test runner for Mocha in the browser",
   "main": "src/index.js",
   "bin": {

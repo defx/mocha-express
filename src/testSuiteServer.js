@@ -117,6 +117,8 @@ async function init(app) {
     });
   });
 
+  app.use(express.static(process.cwd()));
+
   app.get("/", (_, res) => {
     res.send(testSuiteHTML);
   });
