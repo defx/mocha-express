@@ -26,8 +26,8 @@ let tpl = (tests) => {
         <div id="container"></div>
         <script src="mocha.js"></script>
         <script type="module">
-          import { wsReporter } from "/mocha-ws-reporter.js";
           import { expect } from "/chai.js";
+          import { wsReporter } from "/mocha-ws-reporter.js";
 
           window.expect = expect;
 
@@ -62,59 +62,60 @@ async function init(app) {
   const testSuiteHTML = tpl(testFiles);
 
   app.get("/mocha.js", (req, res) => {
-    const filePath = path.join(
-      __dirname,
-      "../node_modules",
-      "mocha",
-      "mocha.js"
-    );
-    res.sendFile(filePath, (err) => {
-      if (err) {
-        res.status(404).send("File not found");
-      }
-    });
+    // Use import.meta.resolve to find the actual installed location of mocha
+    try {
+      const mochaPath = import.meta.resolve("mocha/mocha.js");
+      const filePath = fileURLToPath(mochaPath);
+      res.sendFile(filePath, (err) => {
+        if (err) {
+          res.status(404).send("File not found");
+        }
+      });
+    } catch (error) {
+      res.status(404).send("mocha.js not found");
+    }
   });
 
   app.get("/mocha-ws-reporter.js", (req, res) => {
-    const filePath = path.join(
-      __dirname,
-      "../node_modules",
-      "mocha-ws-reporter",
-      "index.js"
-    );
-    res.sendFile(filePath, (err) => {
-      if (err) {
-        res.status(404).send("File not found");
-      }
-    });
+    try {
+      const reporterPath = import.meta.resolve("mocha-ws-reporter");
+      const filePath = fileURLToPath(reporterPath);
+      res.sendFile(filePath, (err) => {
+        if (err) {
+          res.status(404).send("File not found");
+        }
+      });
+    } catch (error) {
+      res.status(404).send("mocha-ws-reporter.js not found");
+    }
   });
 
   app.get("/chai.js", (req, res) => {
-    const filePath = path.join(
-      __dirname,
-      "../node_modules",
-      "chai",
-      "index.js"
-    );
-    res.sendFile(filePath, (err) => {
-      if (err) {
-        res.status(404).send("File not found");
-      }
-    });
+    try {
+      const chaiPath = import.meta.resolve("chai");
+      const filePath = fileURLToPath(chaiPath);
+      res.sendFile(filePath, (err) => {
+        if (err) {
+          res.status(404).send("File not found");
+        }
+      });
+    } catch (error) {
+      res.status(404).send("chai.js not found");
+    }
   });
 
   app.get("/mocha.css", (req, res) => {
-    const filePath = path.join(
-      __dirname,
-      "../node_modules",
-      "mocha",
-      "mocha.css"
-    );
-    res.sendFile(filePath, (err) => {
-      if (err) {
-        res.status(404).send("File not found");
-      }
-    });
+    try {
+      const mochaPath = import.meta.resolve("mocha/mocha.css");
+      const filePath = fileURLToPath(mochaPath);
+      res.sendFile(filePath, (err) => {
+        if (err) {
+          res.status(404).send("File not found");
+        }
+      });
+    } catch (error) {
+      res.status(404).send("mocha.css not found");
+    }
   });
 
   app.use(express.static(process.cwd()));
