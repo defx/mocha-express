@@ -4,9 +4,8 @@ Browser-based JavaScript testing with Mocha over HTTP that runs on any browser a
 
 **Key Features:**
 
-- Built on **Mocha** for familiar syntax and behavior.
+- Built on **Mocha** and **Chai** for familiar syntax and behavior.
 - Fast CI/CLI test execution via Chrome DevTools Protocol (CDP).
-- Works with **any browser-compatible assertion library** (e.g., Chai).
 - **Watch mode** for instant feedback during development.
 - **Code coverage** via **Istanbul**.
 
@@ -51,38 +50,3 @@ mocha-express --coverage
 ```
 
 Reports are saved in the `coverage/` directory, ready for CI integration or local inspection.
-
----
-
-## CI Integration
-
-`mocha-express` provides proper exit codes and coverage reporting, making it simple to integrate into CI pipelines:
-
-```bash
-mocha-express --coverage
-```
-
----
-
-## Using with Chai
-
-`mocha-express` uses Mocha for test structure and works with any assertion library that runs in the browser. Here’s a simple example with Chai:
-
-```js
-import { expect } from "chai";
-
-describe("DOM Example", () => {
-  it("creates and appends an element", () => {
-    const el = document.createElement("div");
-    document.body.appendChild(el);
-    expect(document.body.contains(el)).to.be.true;
-  });
-
-  it("updates text content", () => {
-    const el = document.createElement("p");
-    el.textContent = "Hello World";
-    document.body.appendChild(el);
-    expect(el.textContent).to.equal("Hello World");
-  });
-});
-```
