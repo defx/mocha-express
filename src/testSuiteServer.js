@@ -1,7 +1,5 @@
 import { fileURLToPath } from "url";
-import fs from "fs";
 import path from "path";
-import esbuild from "esbuild";
 import express from "express";
 import { globby } from "globby";
 
@@ -11,8 +9,7 @@ const __dirname = path.dirname(__filename);
 let tpl = (tests) => {
   const scripts = tests
     .map((src) => {
-      const jsFile = src.replace(/\.ts$/, ".ts.js");
-      return `<script type="module" src="./${jsFile}"></script>`;
+      return `<script type="module" src="./${src}"></script>`;
     })
     .join("\n");
 
@@ -55,10 +52,10 @@ let tpl = (tests) => {
 
 async function init(app) {
   const testFiles = await globby([
-    "test/**/*.{js,ts}",
-    "spec/**/*.{js,ts}",
-    "**/*test.{js,ts}",
-    "**/*spec.{js,ts}",
+    "test/**/*.js",
+    "spec/**/*.js",
+    "**/*test.js",
+    "**/*spec.js",
     "!node_modules",
   ]);
 
@@ -118,29 +115,6 @@ async function init(app) {
         res.status(404).send("File not found");
       }
     });
-  });
-
-  app.use(async (req, res, next) => {
-    let requested = req.path.replace(/^\//, "");
-
-    if (!requested.endsWith(".js")) {
-      return next();
-    }
-
-    const file = await fs.promises.readFile(
-      requested.endsWith(".ts.js")
-        ? requested.replace(/\.ts\.js$/, ".ts")
-        : requested,
-      "utf8"
-    );
-
-    let { code } = await esbuild.transform(file, {
-      format: "esm",
-      sourcemap: "inline",
-    });
-
-    res.type("application/javascript");
-    return res.send(code);
   });
 
   app.get("/", (_, res) => {
